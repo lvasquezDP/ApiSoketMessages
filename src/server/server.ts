@@ -1,5 +1,7 @@
 import express, { Router } from "express";
+import multer from "multer";
 import path from "path";
+import fs from "fs";
 
 interface Options {
   port: number;
@@ -24,6 +26,23 @@ export class Server {
 
   private configure() {
     //* Middlewares
+    const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        if (req.body.emisor) {
+          const path = "uploads/users/" + req.body.emisor ?? "";
+          if (!fs.existsSync(path)) fs.mkdirSync(path);
+          cb(null, path);
+          req.body.path = path + "/" + file.originalname.split(' ').join('_');
+        }
+      },
+      filename: (req, file, cb) => {
+        if (req.body.emisor) {
+          cb(null, file.originalname.split(' ').join('_'));
+        }
+      },
+    });
+    const upload = multer({ storage });
+    this.app.use(upload.single("file"));
     this.app.use(express.json()); // raw
     this.app.use(express.urlencoded({ extended: true })); // x-www-form-urlencoded
 
@@ -35,20 +54,24 @@ export class Server {
 
     //* SPA /^\/(?!api).*/  <== Únicamente si no empieza con la palabra api
     this.app.get(/^\/(?!api).*/, (req, res) => {
-      const indexPath = path.join(
-        __dirname + `../../../${this.publicPath}/index.html`
-      );
-      res.sendFile(indexPath);
+      let rutePath;
+      if (req.originalUrl.match("uploads"))
+        rutePath = path.join(__dirname, "../../", req.originalUrl);
+      else
+        rutePath = path.join(
+          __dirname + `../../../${this.publicPath}/index.html`
+        );
+      res.sendFile(rutePath);
     });
   }
 
   async start() {
-    this.serverListener = this.app.listen(this.port,'0.0.0.0', () => {
+    this.serverListener = this.app.listen(this.port, "0.0.0.0", () => {
       console.log(`Express: Server running on port ${this.port}`);
     });
   }
 
-  public setRoutes(router:Router){
+  public setRoutes(router: Router) {
     this.app.use(router);
   }
 

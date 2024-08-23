@@ -3,6 +3,7 @@ import { CustomError } from "../../rules";
 import { messageUserDTO } from "../../rules/dtos/User/message-user.dto";
 import { UserService } from "../services/User.service";
 import { messagesUserDTO } from "../../rules/dtos/User/messages-user.dto";
+import { UploadedFile } from "express-fileupload";
 
 export class UserController {
   constructor(private readonly service: UserService) {}
@@ -23,8 +24,6 @@ export class UserController {
   };
   getMessages = (req: Request, res: Response) => {
     const { errors, data } = messagesUserDTO.create(req.body);
-    console.log(errors);
-    
     if (errors) return this.handleError(errors, res);
     this.service
       .getMessages(data!)

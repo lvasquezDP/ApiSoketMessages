@@ -1,4 +1,12 @@
 import mongoose, { Schema } from "mongoose";
+interface IMessage extends Document {
+  emisor: mongoose.Types.ObjectId;
+  receptor: mongoose.Types.ObjectId;
+  message?: string;
+  img?: string;
+  entregado?: boolean;
+  visto?: boolean;
+}
 
 const MessageScrema = new mongoose.Schema({
   emisor: {
@@ -13,7 +21,23 @@ const MessageScrema = new mongoose.Schema({
   },
   message: {
     type: String,
-    required: [true, "Message is required"],
+    validate: {
+      validator: function (this: IMessage, value: string) {
+        // Si no hay mensaje, debe haber una imagen
+        return value || this.img;
+      },
+      message: "El mensaje es requerido si no se proporciona una imagen.",
+    },
+  },
+  img: {
+    type: String,
+    validate: {
+      validator: function (this: IMessage, value: string) {
+        // Si no hay imagen, debe haber un mensaje
+        return value || this.message;
+      },
+      message: "La imagen es requerida si no se proporciona un mensaje.",
+    },
   },
   entregado: {
     type: Boolean,
