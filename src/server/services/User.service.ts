@@ -6,16 +6,15 @@ import { messageUserDTO } from "../../rules/dtos/User/message-user.dto";
 import { messagesUserDTO } from "../../rules/dtos/User/messages-user.dto";
 import { WssService } from "./wss.service";
 import path from "path";
+import { FileUploadService } from "./file-upload.service";
 
 export class UserService {
   constructor() {}
 
   public async sendMessage(DTO: messageUserDTO) {
     try {
-      const message = await MessageModel.create(DTO);
-      if (message.img) {
-        message.img = `http://192.168.137.241:3000/${message.img}`;
-      }
+      const files =(await new FileUploadService().uploadMultiple(DTO.files,DTO.emisor)).map(x=>x._id);
+      const message = await MessageModel.findById((await MessageModel.create({...DTO,img:files}))._id).populate('img');
       const user = await UserModel.findOne({ _id: DTO.emisor });
       WssService.instance.sendMessage(
         "message-user",
@@ -34,13 +33,9 @@ export class UserService {
           { receptor: DTO.receptor, emisor: DTO.emisor },
           { receptor: DTO.emisor, emisor: DTO.receptor },
         ],
-      });
-      return messages.map((x) => {
-        if (x.img) {
-          x.img = `http://192.168.137.241:3000/${x.img}`;
-        }
-        return x;
-      });
+      }).populate('img')
+      .sort({ created_at: -1 });
+      return messages;
     } catch (error) {
       throw CustomError.internalServer(`${error}`);
     }

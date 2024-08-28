@@ -35,7 +35,10 @@ export class WssService {
       ws.id = query.id?.toString();
       console.log("client connect:", query.id);
       this.usersConected();
-      ws.onclose = () => this.usersConected();
+      ws.onclose = (ws) => {
+        console.log("client closed:", query.id);
+        this.usersConected()
+      };
     });
   }
 
@@ -63,7 +66,7 @@ export class WssService {
     const ids = await Promise.all(
       Array.from(this.wss.clients).map(async (ws: CustomWebSocket) => {
         if (ws.readyState == WebSocket.OPEN)
-          return await UserModel.findOne({ _id: ws.id });
+          return await UserModel.findOne({ _id: ws.id }).populate(['avatar','img']);
         return null;
       })
     );

@@ -14,8 +14,8 @@ export class ImageController {
 
   getImage = (req: Request, res: Response) => {
     this.service
-      .getImage(req.params.type, req.params.name)
-      .then((x) => res.sendFile(x))
+      .getImage(req.params.id)
+      .then((x) => res.send(x))
       .catch((e) => this.handleError(e, res));
   };
 }

@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { envs } from "../../../config";
 interface IMessage extends Document {
   emisor: mongoose.Types.ObjectId;
   receptor: mongoose.Types.ObjectId;
@@ -30,7 +31,8 @@ const MessageScrema = new mongoose.Schema({
     },
   },
   img: {
-    type: String,
+    type:[Schema.Types.ObjectId],
+    ref: "Media",
     validate: {
       validator: function (this: IMessage, value: string) {
         // Si no hay imagen, debe haber un mensaje
@@ -47,6 +49,10 @@ const MessageScrema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  created_at: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 MessageScrema.set("toJSON", {

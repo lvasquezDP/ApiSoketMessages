@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userScrema = new mongoose.Schema({
   name: {
@@ -19,7 +19,12 @@ const userScrema = new mongoose.Schema({
     required: [true, "Password is required"],
   },
   img: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: "Media",
+  },
+  avatar: {
+    type: Schema.Types.ObjectId,
+    ref: "Media",
   },
   role: {
     type: [String],

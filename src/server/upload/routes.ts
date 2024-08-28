@@ -12,10 +12,12 @@ export class UploadRoutes {
       new FileUploadService()
     );
     router.use(ContainFiles);
-    router.use(FileTypes(2));
+    // router.use(FileTypes(2));
     // Definir las rutas
-    router.post("/single/:type", controller.upload);
-    router.post("/multiple/:type", controller.uploads);
+    router.post("/avatar", controller.avatar);
+    router.post("/imagen", controller.imagen);
+    router.post("/single/:type",FileTypes(2), controller.upload);
+    router.post("/multiple/:type",FileTypes(2), controller.uploads);
 
     return router;
   }

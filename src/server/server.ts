@@ -1,7 +1,6 @@
 import express, { Router } from "express";
-import multer from "multer";
 import path from "path";
-import fs from "fs";
+import fileUpload from "express-fileupload";
 
 interface Options {
   port: number;
@@ -26,24 +25,8 @@ export class Server {
 
   private configure() {
     //* Middlewares
-    const storage = multer.diskStorage({
-      destination: (req, file, cb) => {
-        if (req.body.emisor) {
-          const path = "uploads/users/" + req.body.emisor ?? "";
-          if (!fs.existsSync(path)) fs.mkdirSync(path);
-          cb(null, path);
-          req.body.path = path + "/" + file.originalname.split(' ').join('_');
-        }
-      },
-      filename: (req, file, cb) => {
-        if (req.body.emisor) {
-          cb(null, file.originalname.split(' ').join('_'));
-        }
-      },
-    });
-    const upload = multer({ storage });
-    this.app.use(upload.single("file"));
     this.app.use(express.json()); // raw
+    this.app.use(fileUpload()); // multipart/form-data
     this.app.use(express.urlencoded({ extended: true })); // x-www-form-urlencoded
 
     //* Public Folder

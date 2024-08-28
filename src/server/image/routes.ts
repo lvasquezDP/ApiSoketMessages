@@ -10,10 +10,10 @@ export class ImageRoutes {
     const controller = new ImageController(
       new ImageService()
     );
-    router.use(FileTypes(1));
+    // router.use(FileTypes(1));
 
     // Definir las rutas
-    router.get("/:type/:name", controller.getImage);
+    router.get("/:id", controller.getImage);
 
     return router;
   }

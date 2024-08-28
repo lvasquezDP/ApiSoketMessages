@@ -12,11 +12,29 @@ export class UploadController {
     return res.status(400).json({ errors });
   };
 
+  avatar = (req: Request, res: Response) => {
+    const file = req.body.files.at(0) as UploadedFile;
+
+    this.service
+      .avatar(file,req.body.user.id)
+      .then((up) => res.json(up))
+      .catch((e) => this.handleError(e, res));
+  };
+
+  imagen = (req: Request, res: Response) => {
+    const file = req.body.files.at(0) as UploadedFile;
+
+    this.service
+      .imagen(file,req.body.user.id)
+      .then((up) => res.json(up))
+      .catch((e) => this.handleError(e, res));
+  };
+
   upload = (req: Request, res: Response) => {
     const file = req.body.files.at(0) as UploadedFile;
 
     this.service
-      .uploadSingle(file,req.params.type)
+      .uploadSingle(file,req.body.user.id)
       .then((up) => res.json(up))
       .catch((e) => this.handleError(e, res));
   };
@@ -25,7 +43,7 @@ export class UploadController {
     const file = req.body.files as UploadedFile[];
     
     this.service
-      .uploadMultiple(file,req.params.type)
+      .uploadMultiple(file,req.body.emisor)
       .then((up) => res.json(up))
       .catch((e) => this.handleError(e, res));
   };

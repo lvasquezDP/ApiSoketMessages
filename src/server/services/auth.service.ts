@@ -12,7 +12,7 @@ export class AuthService {
   constructor(private readonly emailService: EmailService) {}
 
   public async loginUser(DTO: loginUserDTO) {
-    const userdb = await UserModel.findOne({ email: DTO.email });
+    const userdb = await UserModel.findOne({ email: DTO.email }).populate(['avatar','img']);
     if (!userdb) throw CustomError.unAuthorized("User not exist");
     if (!bcrypt.compare(DTO.password, userdb.password))
       throw CustomError.unAuthorized(`Password not match`);
@@ -21,7 +21,7 @@ export class AuthService {
 
       return {
         token: await JWT.generateToken({ email: user.email, id: user.id }),
-        user,
+        user:userdb,
       };
     } catch (error) {
       throw CustomError.internalServer(`${error}`);
