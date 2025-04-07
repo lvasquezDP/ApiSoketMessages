@@ -11,7 +11,7 @@ export class FileUploadService {
   constructor(private readonly id = uuid) {}
 
   private checkFolder(path: string) {
-    if (!fs.existsSync(path)) fs.mkdirSync(path);
+    if (!fs.existsSync(path)) fs.mkdirSync(path,{recursive:true});
   }
 
   async uploadSingle(file: UploadedFile, owner: string) {
