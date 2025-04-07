@@ -39,6 +39,22 @@ export class WssService {
         console.log("client closed:", query.id);
         this.usersConected()
       };
+
+      ws.on("message", (data) => {
+        try {
+          const { type, payload, to } = JSON.parse(data.toString());
+          if (!type || !payload || !to) return;
+          
+          this.wss.clients.forEach((client: CustomWebSocket) => {
+            if (client.id === to && client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify({ type, payload, from: ws.id }));
+            }
+          });
+        } catch (err) {
+          console.error("Error parsing message:", err);
+        }
+      });
+
     });
   }
 
